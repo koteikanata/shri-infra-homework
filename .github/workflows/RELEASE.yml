@@ -122,7 +122,7 @@ jobs:
         with:
           github-token: ${{ secrets.GIT_TOKEN }}
           script: |
-            const { issues, context } = require('@actions/github');
+            const { issues } = require('@actions/github');
             const commits = process.env['commits'] || 'No commits found';
             issues.create({
               owner: context.repo.owner,
