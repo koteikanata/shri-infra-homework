@@ -120,24 +120,19 @@ jobs:
            echo "::set-output name=commits::${COMMITS}"
 
       - name: Create GitHub Issue
-        uses: actions/github-script@v6
-        with:
-          github-token: ${{ secrets.GIT_TOKEN }}
-          script: |
-            const { context } = require('@actions/github');  
-            const commits = process.env['commits'] || 'No commits found';
-            github.issues.create({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              title: `Release ${{ github.run_number }}`,
-              body: `
-              **Date:** ${new Date().toISOString().split('T')[0]}
-              **Author:** ${context.actor}
-              **Version:** ${{ github.run_number }}
-              **Commits:** ${commits}
+        run: |
+          new_issue_url=$(gh issue create \
+            --title "$TITLE" \
+            --body "$BODY")
+        env:
+          GH_TOKEN: ${{secrets.GIT_TOKEN}}
+          GH_REPO: ${{ github.repository }}
+          TITLE: Release ${{ github.run_number }}
+          BODY: |
               **Docker Image:** cr.yandex/${{ secrets.REGISTRY_ID }}/app:${{ github.run_number }}
-              `
-            });
+
+          PINNED: false
+          CLOSE_PREVIOUS: false
 
       - name: Update CHANGELOG.md
         run: |
